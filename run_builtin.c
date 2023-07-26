@@ -12,7 +12,8 @@ int run_builtin(info_t *info, int builtin_num)
 {
 	int (*builtin_funcs[])(info_t *) = {
 		&shellby_exit,
-		&shellby_env
+		&shellby_env,
+		&shellby_cd
 	};
 
 	return (builtin_funcs[builtin_num](info));

@@ -41,6 +41,7 @@ int execute(info_t *info);
 /* Built-in commands */
 int shellby_exit(info_t *info);
 int shellby_env(info_t *info);
+int shellby_cd(info_t *info);
 
 #endif /* SHELL_H */
 

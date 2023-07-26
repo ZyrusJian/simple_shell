@@ -9,7 +9,7 @@
 
 int find_builtin(char **args)
 {
-	const char *builtins[] = {"exit", "env"};
+	const char *builtins[] = {"exit", "env", "cd"};
 	int num_builtins = sizeof(builtins) / sizeof(char *);
 	int i;
 

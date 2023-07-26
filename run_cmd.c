@@ -21,7 +21,7 @@ int run_cmd(info_t *info)
 	child_pid = fork();
 	if (child_pid == -1)
 	{
-		perror("fork");
+		perror("fork failed");
 		exit(EXIT_FAILURE);
 	}
 	else if (child_pid == 0)

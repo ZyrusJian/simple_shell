@@ -42,7 +42,9 @@ int run_cmd(info_t *info)
 		exit(EXIT_FAILURE);
 	}
 	else
+	{
 		wait_for_child(pid, &status);
+	}
 
 	if (command_path != NULL && command_path != info->args[0])
 		free(command_path);

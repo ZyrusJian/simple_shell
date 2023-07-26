@@ -29,8 +29,6 @@ int main(int __attribute__((unused)) ac, char **av, char **env)
 		else
 		{
 			printf("Error: Executable not found %s\n", info.args[0]);
-			free(info.input);
-			free(info.args);
 		}
 		free(info.input);
 		free(info.args);

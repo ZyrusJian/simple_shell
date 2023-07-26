@@ -1,18 +1,30 @@
+
 #include "shell.h"
 
 /**
- * main - entry point for simple shell
- * @ac: arg count
- * @av: arg vector
- * Return: 0 on success
+ * main - entry point for the shell program
+ * @ac: number of arguments passed to the program
+ * @av: array of strings containing the arguments
+ * @env: array of strings containing the environment variables
+ *
+ * Return: 0 on successful execution
  */
-
-int main(int ac, char **av)
+int main(int __attribute__((unused)) ac, char **av, char **env)
 {
 	info_t info;
 
 	info.av = av;
-	info.status = 0;
-	init_shell(&info);
+	info.env = env;
+
+	/* shell main loop */
+	while (1)
+	{
+		printf("simple_shell$ ");
+		info.input = read_line();
+		info.args = split_line(info.input);
+		run_cmd(&info);
+	}
+
 	return (0);
 }
+

@@ -13,8 +13,14 @@ char *read_input(info_t *info)
 	ssize_t characters;
 	char *input = NULL;
 
-	/* getline to read stdin */
-	/* handle eof / error */
+	chars_read = getline(&line, &len, stdin);
+
+	if (chars_read == -1)
+	{
+		free(line);
+		exit(0);
+	}
+
 	info->counters.lines++;
 
 	return (input);
@@ -33,8 +39,32 @@ char **split_input(char *input)
 	char *tokens = malloc(buf_size * sizeof(char));
 	char *token;
 
-	/* strtok to extract tokens */
-	/* realloc if necessary */
+	if (!tokens)
+	{
+		fprintf(stderr, "Allocation error\n");
+		exit(EXIT_FAILURE);
+	}
 
+	token = strtok(line, DELIMS);
+	while (token != NULL)
+	{
+		tokens[pos] = token;
+		pos++;
+
+		if (pos >= bufsize)
+		{
+			bufsize += 64;
+			tokens = realloc(tokens, bufsize * sizeof(char *));
+			if (!tokens)
+			{
+				fprintf(stderr, "Allocation error\n");
+				exit(EXIT_FAILURE);
+			}
+		}
+
+		token = strtok(NULL, DELIMS);
+	}
+
+	tokens[pos] = NULL;
 	return (tokens);
 }

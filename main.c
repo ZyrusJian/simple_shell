@@ -21,11 +21,18 @@ int main(int __attribute__((unused)) ac, char **av, char **env)
 		write(STDOUT_FILENO, PROMPT, strlen(PROMPT));
 		info.input = read_line();
 		info.args = split_line(info.input);
-		info.status = execute(&info);
-	}
-	free(info.input);
-	free(info.args);
 
+		if ((info.args[0]) != NULL)
+		{
+			info.status = execute(&info);
+		}
+		else
+		{
+			printf("Error: Executable not found %s\n", info.args[0]);
+			free(info.input);
+			free(info.args);
+		}
+	}
 	return (0);
 }
 

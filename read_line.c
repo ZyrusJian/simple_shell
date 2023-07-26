@@ -12,15 +12,22 @@ char *read_line(void)
 	size_t bufsize = 0;
 
 	/* Read line using getline */
-	getline(&line, &bufsize, stdin);
-
-	/* Check for EOF */
-	if (feof(stdin))
+	if (getline(&line, &bufsize, stdin) == -1)
 	{
-		free(line);
-		line = NULL;
+		if (feof(stdin))
+		{
+			/* End of file condition (ctrl+d) */
+			printf("End of file reached. Exiting...\n");
+			free(line);
+			line = NULL;
+			exit(0);
+		}
+		else
+		{
+			perror("getline");
+			exit(1);
+		}
 	}
-
 	return (line);
 }
 

@@ -18,6 +18,7 @@ char **split_line(char *line)
 	if (!args)
 	{
 		perror("Memory allocation error");
+		free(args);
 		exit(EXIT_FAILURE);
 	}
 
@@ -33,6 +34,7 @@ char **split_line(char *line)
 			if (!args)
 			{
 				perror("Memory allocation error");
+				free(args);
 				exit(EXIT_FAILURE);
 			}
 		}

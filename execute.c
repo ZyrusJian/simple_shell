@@ -8,32 +8,15 @@
 
 int execute(info_t *info)
 {
-	pid_t pid;
-	int status;
-
-	pid = fork();
-
-	if (pid == -1)
+	int is_builtin;
+	is_builtin = find_builtin(info->args);
+	if (is_builtin != -1)
 	{
-		perror("Fork Error");
-	}
-	else if (pid == 0)
-	{
-		/* child process */
-		if (execve(info->args[0], info->args, info->env) == -1)
-		{
-			perror("Execve Error");
-			exit(EXIT_FAILURE);
-		}
+		return run_builtin(info, is_builtin);
 	}
 	else
 	{
-		/* parent process */
-		do {
-			waitpid(pid, &status, WUNTRACED);
-		} while (!WIFEXITED(status) && !WIFSIGNALED(status));
+		return run_cmd(info);
 	}
-
-	return (status);
 }
 

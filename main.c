@@ -22,8 +22,10 @@ int main(int __attribute__((unused)) ac, char **av, char **env)
 		printf("simple_shell$ ");
 		info.input = read_line();
 		info.args = split_line(info.input);
-		run_cmd(&info);
+		info.status = execute(&info);
 	}
+	free(info.input);
+	free(info.args);
 
 	return (0);
 }

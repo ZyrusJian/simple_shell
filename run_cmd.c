@@ -6,45 +6,33 @@
  *
  * Return: status of the execution
  */
+
 int run_cmd(info_t *info)
 {
-	pid_t child_pid;
+	pid_t pid;
 	int status;
-	int command_found = 0;
-	int builtin_num = find_builtin(info->args);
 
-	if (builtin_num >= 0)
+	pid = fork();
+	if (pid == 0)
 	{
-		return (run_builtin(info, builtin_num));
-	}
 
-	child_pid = fork();
-	if (child_pid == -1)
-	{
-		perror("fork failed");
+		if (execve(info->args[0], info->args, info->env) == -1)
+		{
+			fprintf(stderr, "Command not found\n");
+		}
 		exit(EXIT_FAILURE);
 	}
-	else if (child_pid == 0)
+	else if (pid < 0)
 	{
-		/* child process */
-		command_found = execute(info);
-		if (command_found == -1)
-		{
-			printf("%s: command not found\n", info->args[0]);
-			exit(127);
-		}
-		execve(info->args[0], info->args, environ);
-		perror("execve");
+		fprintf(stderr, "Fork error\n");
 		exit(EXIT_FAILURE);
 	}
 	else
 	{
-		/* parent process */
-		waitpid(child_pid, &status, 0);
-		if (WIFEXITED(status))
-		{
-			info->status = WEXITSTATUS(status);
-		}
+		do {
+			waitpid(pid, &status, WUNTRACED);
+		} while (!WIFEXITED(status) && !WIFSIGNALED(status));
 	}
-	return (info->status);
+	return 1;
 }
+

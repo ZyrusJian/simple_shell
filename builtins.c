@@ -7,7 +7,11 @@
  */
 int shellby_exit(info_t *info)
 {
-	exit(info->status);
+	free(info->input);
+	free(info->args);
+	exit(EXIT_SUCCESS);
+
+	return 0;
 }
 
 /**
@@ -35,6 +39,7 @@ int shellby_env(info_t *info)
  *
  * Return: 0 on success, -1 on failure
  */
+
 int shellby_cd(info_t *info)
 {
 	char *homedir;

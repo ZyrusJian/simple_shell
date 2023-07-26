@@ -1,4 +1,3 @@
-
 #include "shell.h"
 
 /**
@@ -19,7 +18,7 @@ int main(int __attribute__((unused)) ac, char **av, char **env)
 	/* shell main loop */
 	while (1)
 	{
-		printf("simple_shell$ ");
+		write(STDOUT_FILENO, PROMPT, strlen(PROMPT));
 		info.input = read_line();
 		info.args = split_line(info.input);
 		info.status = execute(&info);

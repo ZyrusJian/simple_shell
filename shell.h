@@ -11,6 +11,7 @@
 #include <sys/stat.h>
 #include <signal.h>
 
+#define PROMPT "simple_shell$ "
 extern char **environ;
 
 /**

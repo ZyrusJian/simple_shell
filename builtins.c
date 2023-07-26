@@ -46,20 +46,11 @@ int shellby_cd(info_t *info)
 	const char *oldpwd;
 
 	if (info->args[1] == NULL)
-	{
-		/* cd to home directory */
+	{	/* cd to home directory */
 		const char *home_dir = getenv("HOME");
 
-		if (home_dir == NULL)
-		{
-			perror("no such directory");
-			return (-1);
-		}
-		if (chdir(home_dir) != 0)
-		{
-			perror("no such directory");
-			return (-1);
-		}
+		((home_dir == NULL) || (chdir(home_dir) != 0))
+			? (perror("no such directory"), -1) : 0;
 	}
 	else if (strcmp(info->args[1], "-") == 0)
 	{
@@ -76,26 +67,16 @@ int shellby_cd(info_t *info)
 		printf("%s\n", getenv("PWD"));
 	}
 	else
-	{
-		/* cd to specified directory */
-		if (chdir(info->args[1]) != 0)
-		{
-			perror("no such directory");
-			return (-1);
-		}
-	}
-
-	/* update pwd and oldpwd environment variables */
+	{	/* cd to specified directory */
+		((info->args[1] != NULL) && (chdir(info->args[1]) != 0))
+			? (perror("no such directory"), -1) : 0;
+	} /* update pwd and oldpwd environment variables */
 	oldpwd = getenv("PWD");
 	if (getcwd(buf, sizeof(buf)) != NULL)
 	{
 		setenv("OLDPWD", oldpwd, 1);
 		setenv("PWD", buf, 1);
-	}
-	else
-	{
-		perror("no such directory");
-		return (-1);
+		printf("%s\n", getenv("PWD"));
 	}
 	return (0);
 }

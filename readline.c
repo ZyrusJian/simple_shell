@@ -9,14 +9,24 @@
 char *read_line(void)
 {
 	char *line = NULL;
-	size_t size = 0;
+	size_t bufsize = 0;
 
-	if (getline(&line, &size, stdin) == -1)
+	/* Read line using getline */
+	if (getline(&line, &bufsize, stdin) == -1)
 	{
 		if (feof(stdin))
-			exit(EXIT_SUCCESS);
-		perror("readline");
-		exit(EXIT_FAILURE);
+		{
+			/* End of file condition (ctrl+d) */
+			free(line);
+			line = NULL;
+			exit(0);
+		}
+		else
+		{
+			perror("getline");
+			exit(1);
+		}
 	}
 	return (line);
 }
+

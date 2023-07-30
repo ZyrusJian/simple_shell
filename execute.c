@@ -9,37 +9,20 @@
 
 int execute(char **args)
 {
-	pid_t pid;
-	int status;
+	int (*builtin_func)(char **);
 
-	/**
-	 * Fork a child process
-	 */
-	pid = fork();
-
-	if (pid == 0)
+	/* Check if command is a builtin */
+	builtin_func = find_builtin(args[0]);
+	if (builtin_func != NULL)
 	{
-		/* Child process */
-
-		/* Check if command is a builtin */
-
-		if (run_builtin(args))
-			exit(EXIT_SUCCESS);
-
-		/* If not a builtin, try to run command from PATH */
-		if (run_path_cmd(args))
-			exit(EXIT_SUCCESS);
-
-		/* If not found, return error */
-		perror("Error executing command");
-		exit(EXIT_FAILURE);
+		return (run_builtin(args));
 	}
 	else
 	{
-		/* Parent process */
-		do {
-			waitpid(pid, &status, WUNTRACED);
-		} while (!WIFEXITED(status) && !WIFSIGNALED(status));
+		/* If not a builtin, try to run command from PATH */
+		return (run_path_cmd(args));
 	}
-	return (status);
+	if (strcmp(args[0], "exit") == 0)
+		exit(0);
+	return (1);
 }

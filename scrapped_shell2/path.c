@@ -1,26 +1,6 @@
 #include "shell.h"
 
 /**
- * free_list - free the list_t list
- * @head: A pointer to the head of the list_t list
- *
- * Return: address of the new element, or NULL on failure
- */
-
-void free_list(list_t *head)
-{
-	list_t *current = head;
-	list_t *next;
-
-	while (current != NULL)
-	{
-		next = current->next;
-		free(current);
-		current = next;
-	}
-}
-
-/**
  * add_node - Adds a new node at the beginning of a list_t list
  * @head: A pointer to the head of the list_t list
  * @str: The string to be added to the list_t list
@@ -34,10 +14,7 @@ list_t *add_node(list_t **head, char *str)
 
 	new = malloc(sizeof(list_t));
 	if (new == NULL)
-	{
-		free(new);
 		return (NULL);
-	}
 
 	new->str = strdup(str);
 	new->len = _strlen(str);
@@ -84,33 +61,24 @@ list_t *construct_path(void)
 int run_path_cmd(char **args)
 {
 	list_t *path_list = construct_path();
-	char *cmd_path, *command = NULL;
-	int i, cmd_index = 0;
-
-	i = 0;
-	while (args[i] != NULL)
-	{
-		i++;
-	}
-	cmd_index = i - 1;
-	command = args[cmd_index];
-	if (command == NULL)
-	{
-		fprintf(stderr, "%s: Command not found\n", command);
-		return (0);
-	} /* Handle empty PATH */
+	char *cmd_path;
+	int i;
+	/* Handle empty PATH */
 	if (!path_list)
 	{
 		fprintf(stderr, "%s: Command not found\n", args[0]);
-		free_list(path_list);
 		return (0);
 	}
 	cmd_path = malloc(sizeof(char) * ARG_MAX);
-	for (i = 0; path_list; i++) /* Loop through PATH */
+	/* Loop through PATH */
+	for (i = 0; path_list; i++)
 	{	/* Check if PATH entry is executable */
 		strcpy(cmd_path, path_list->str);
 		strcat(cmd_path, "/");
-		strcat(cmd_path, command);
+		strcat(cmd_path, args[0]);
+
+		printf("Trying path %s\n", cmd_path); /* Print for debugging */
+
 		if (access(cmd_path, X_OK) == 0)
 		{	/* Execute command */
 			args[0] = cmd_path;
@@ -123,7 +91,7 @@ int run_path_cmd(char **args)
 		path_list = path_list->next;
 	}	/* Command not found */
 	fprintf(stderr, "%s: Command not found.\n", args[0]);
+
 	free(cmd_path);
-	free_list(path_list);
 	return (0);
 }

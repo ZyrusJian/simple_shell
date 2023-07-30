@@ -9,15 +9,41 @@
 
 int builtin_cd(char **args)
 {
+	char buf[1024];
+	const char *oldpwd;
+
 	if (args[1] == NULL)
-	{
-		fprintf(stderr, "Expected argument to \"cd\"\n");
-		return (1);
+	{	/* cd to home directory */
+		const char *home_dir = getenv("HOME");
+
+		((home_dir == NULL) || (chdir(home_dir) != 0))
+			? (perror("no such directory"), -1) : 0;
 	}
-	if (chdir(args[1]) != 0)
+	else if (strcmp(args[1], "-") == 0)
 	{
-		perror("chdir");
-		return (1);
+		if (getenv("OLDPWD") == NULL)
+		{
+			setenv("OLDPWD", getenv("PWD"), 1);
+		}
+		else
+		{
+			chdir(getenv("OLDPWD"));
+			setenv("OLDPWD", getenv("PWD"), 1);
+			setenv("PWD", getcwd(buf, sizeof(buf)), 1);
+		}
+		printf("%s\n", getenv("PWD"));
+	}
+	else
+	{	/* cd to specified directory */
+		((args[1] != NULL) && (chdir(args[1]) != 0))
+			? (perror("no such directory"), -1) : 0;
+	} /* update pwd and oldpwd environment variables */
+	oldpwd = getenv("PWD");
+	if (getcwd(buf, sizeof(buf)) != NULL)
+	{
+		setenv("OLDPWD", oldpwd, 1);
+		setenv("PWD", buf, 1);
+		printf("%s\n", getenv("PWD"));
 	}
 	return (0);
 }
@@ -52,56 +78,6 @@ int builtin_env(char **args)
 int builtin_exit(char **args)
 {
 	(void) args;
-	exit(EXIT_SUCCESS);
 	return (0);
 }
 
-/**
- * find_builtin - Locates a builtin command
- * @command: The command name
- *
- * Return: A function pointer to the corresponding builtin
- */
-
-int (*find_builtin(char *command))(char **)
-{
-	char *builtins[] = {
-		"cd",
-		"env",
-		"exit"
-	};
-
-	int (*funcs[])(char **) = {
-		&builtin_cd,
-		&builtin_env,
-		&builtin_exit
-	};
-
-	int i, num_builtins;
-
-	num_builtins = sizeof(funcs) / sizeof(int (*)(char **));
-	for (i = 0; i < num_builtins; i++)
-	{
-		if (strcmp(command, builtins[i]) == 0)
-			return (funcs[i]);
-	}
-	return (NULL);
-}
-
-/**
- * run_builtin - Runs a builtin command
- * @args: Null terminated argument array
- *
- * Return: 1 if the shell should continue, 0 if it should terminate
- */
-
-int run_builtin(char **args)
-{
-	int (*builtin_func)(char **);
-
-	builtin_func = find_builtin(args[0]);
-	if (builtin_func != NULL)
-		return (builtin_func(args));
-
-	return (1); /* Default to continue */
-}

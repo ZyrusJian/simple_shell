@@ -28,7 +28,7 @@ typedef struct list_s
 
 #define ARG_MAX 1024 /* Max arg length */
 #define ARG_NUM 128 /* Max arg count */
-#define DELIM " \t\r\n\a"
+#define DELIM " \t\r\n\a/"
 
 /* Global environ, a pointer to an array of char * strings */
 extern char **environ;
@@ -47,6 +47,7 @@ int run_builtin(char **args);
 int run_path_cmd(char **args);
 list_t *add_node(list_t **head, char *str);
 list_t *construct_path(void);
+void free_list(list_t *head);
 
 int _putchar(char c);
 char *_strcat(char *dest, char *src);

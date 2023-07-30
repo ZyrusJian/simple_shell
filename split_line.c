@@ -16,6 +16,7 @@ char **split_line(char *line)
 	if (!tokens)
 	{
 		perror("Allocation error");
+		free(tokens);
 		exit(EXIT_FAILURE);
 	}
 

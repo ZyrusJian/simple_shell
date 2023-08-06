@@ -75,6 +75,30 @@ list_t *construct_path(void)
 }
 
 /**
+ * construct_cmd_path - construct command path
+ * @path: path entry from path_list
+ * @command: command to be executed
+ *
+ * Return: allocated string containing the constructed path,
+ *	or NULL on failure
+ */
+
+char *construct_cmd_path(char *path, char *command)
+{
+	char *cmd_path;
+
+	cmd_path = malloc(sizeof(char) * (ARG_MAX));
+	if (cmd_path == NULL)
+		return (NULL);
+
+	strcpy(cmd_path, path);
+	strcat(cmd_path, "/");
+	strcat(cmd_path, command);
+
+	return (cmd_path);
+}
+
+/**
  * run_path_cmd - Attempt to run command by searching PATH
  * @args: Argument array, args[0] is command
  *
@@ -85,15 +109,13 @@ int run_path_cmd(char **args)
 {
 	list_t *path_list = construct_path();
 	char *cmd_path, *command = NULL;
-	int i, cmd_index = 0;
+	int i = 0;
 
-	i = 0;
 	while (args[i] != NULL)
 	{
 		i++;
 	}
-	cmd_index = i - 1;
-	command = args[cmd_index];
+	command = args[(i - 1)];
 	if (command == NULL)
 	{
 		fprintf(stderr, "%s: Command not found\n", command);
@@ -105,13 +127,11 @@ int run_path_cmd(char **args)
 		free_list(path_list);
 		return (0);
 	}
-	cmd_path = malloc(sizeof(char) * ARG_MAX);
+	cmd_path = NULL;
 	for (i = 0; path_list; i++) /* Loop through PATH */
 	{	/* Check if PATH entry is executable */
-		strcpy(cmd_path, path_list->str);
-		strcat(cmd_path, "/");
-		strcat(cmd_path, command);
-		if (access(cmd_path, X_OK) == 0)
+		cmd_path = construct_cmd_path(path_list->str, command);
+		if (cmd_path != NULL && access(cmd_path, X_OK) == 0)
 		{	/* Execute command */
 			args[0] = cmd_path;
 			execvp(args[0], args);
@@ -120,10 +140,10 @@ int run_path_cmd(char **args)
 			args[0] = args[0] - (i * (ARG_MAX)); /* Restore arg */
 			return (1);
 		}
+		free(cmd_path);
 		path_list = path_list->next;
 	}	/* Command not found */
 	fprintf(stderr, "%s: Command not found.\n", args[0]);
-	free(cmd_path);
 	free_list(path_list);
 	return (0);
 }
